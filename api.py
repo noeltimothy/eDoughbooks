@@ -1,25 +1,13 @@
 from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
-#from extensions import db
-#from models.daily.daily import Daily
 from sqlalchemy import create_engine
-#from sqlalchemy.orm import Session
-#import simplejson
 from datetime import datetime, timedelta
 import pandas as pd
 
 
-#def extensions(app):
-#    db.init_app(app)
-#    return None
-
 app = Flask(__name__, static_folder="./static/public/dist", template_folder="./static/public")
 CORS(app)
-
-app.config.from_object('config.settings')
-app.config.from_pyfile('settings.py', silent=True)
-#db.init_app(app)
 
 engine = create_engine("postgresql://postgres:admin@localhost:5432/test")
 
