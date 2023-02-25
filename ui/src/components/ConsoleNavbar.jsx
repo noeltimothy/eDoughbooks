@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import Jdenticon from './Jdenticon';
 import useAuth from '../hooks/useAuth';
+import { NavLink } from 'react-router-dom';
+import { FaUser } from "react-icons/fa";
+
 
 import { logout } from '../services/MockAuthService';
 
@@ -11,6 +13,10 @@ function ConsoleNavbar() {
   const navigate = useNavigate();
   const auth = useAuth();
   const user = auth.getSession();
+  const items = [
+    { "path": "/console", "title": "Daily Values" },
+    { "path": "/console/apps", "title": "Next Morning Values" },
+  ]
 
   const handleLogout = async (e) => {
     e.preventDefault();
@@ -23,20 +29,20 @@ function ConsoleNavbar() {
     <nav className="navbar navbar-expand-lg navbar-dark sticky-top bg-dark p-1 shadow">
       <div className="d-flex flex-grow-1">
         <a className="navbar-brand d-flex pt-2" href="/console">
-          <img src={logo} alt="console logo" className="navbar-logo" />Admin Console
+          Admin Console
         </a>
-        <div className="w-100 text-right">
-          <button className="navbar-toggler collapsed"
-                  type="button"
-                  data-bs-toggle="collapse"
-                  data-bs-target="#sidebarMenu"
-                  aria-controls="sidebarMenu"
-                  aria-expanded="false"
-                  aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"/>
-          </button>
+        <div className="collapse navbar-collapse" id="navbarMenu">
+          <ul className="navbar-nav">
+            {
+              items.map((item, i) => (
+                <li key={i} className="nav-item">
+                  <NavLink className="nav-link" to={item.path}>{item.title}</NavLink>
+                </li>
+              ))
+            }
+          </ul>
         </div>
+
         <div className="collapse navbar-collapse flex-grow-1 text-right" id="navbarDropdown">
           <ul className="navbar-nav ms-auto flex-nowrap">
             <li className="nav-item dropdown">
@@ -45,8 +51,7 @@ function ConsoleNavbar() {
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
               >
-                <Jdenticon className="nav-avatar rounded-circle" name={user.username} height="32px" width="32px" />
-                {user.username}
+              {user.username}  <FaUser />
               </button>
               <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu">
                 <li>

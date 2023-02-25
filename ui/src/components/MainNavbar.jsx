@@ -4,17 +4,11 @@ import './navbar.css';
 import logo from './doughbooks.png';
 
 function MainNavbar() {
-  const items = [
-    { path: '/', title: 'Home' },
-    { path: '/logout', title: 'Logout' },
-    { path: '/signup', title: 'Signup' },
-  ];
-
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
         <a className="navbar-brand d-flex pt-2" href="/">
-          <img src={logo} alt="" className="navbar-logo" />eDoughBooks
+          eDoughBooks
         </a>
         <button className="navbar-toggler collapsed"
                 type="button"
@@ -26,17 +20,6 @@ function MainNavbar() {
         >
           <span className="navbar-toggler-icon"/>
         </button>
-        <div className="collapse navbar-collapse" id="navbarMenu">
-          <ul className="navbar-nav">
-            {
-              items.map((item, i) => (
-                <li key={i} className="nav-item">
-                  <NavLink className="nav-link" to={item.path}>{item.title}</NavLink>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
       </div>
     </nav>
   );
