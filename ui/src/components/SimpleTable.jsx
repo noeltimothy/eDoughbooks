@@ -122,7 +122,7 @@ const SimpleTable = (props) => {
               </div>
               <div className="w-25 p-2">
                 <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'} />
-              </div>)
+              </div>
           </div>}
           {(tableType=='yesterday') && dkeys &&
             <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row'> 

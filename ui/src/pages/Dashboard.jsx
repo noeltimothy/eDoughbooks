@@ -78,6 +78,11 @@ function Dashboard() {
 	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='today' ev={todays_events}/>
             </div>
           </div>
+          <div className="d-flex p-4 flex-column d-sm-flex">
+            <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
+	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='yesterday' ev={todays_events}/>
+            </div>
+          </div>
        </div>
     </>
   );
