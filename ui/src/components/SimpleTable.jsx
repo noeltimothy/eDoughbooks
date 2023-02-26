@@ -114,20 +114,30 @@ const SimpleTable = (props) => {
         </div>
       }
 
-      <div style={{ "display": "flex", "flex-direction": "column" }}>
-        <div style={{ "display": "flex", "flex-direction": "row", "align-items": "start" }}>
-          <div className="w-75 p-2">
-          {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={(tableType=='today') ? 'editable': 'fixed'} haveHandler={haveHandler}/>}
-          </div>
-          <div className="w-25 p-2">
-          {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'} />}
-          </div>
+      <div className='d-flex flex-column d-sm-flex flex-sm-row'>
+        {(tableType == 'today') && dkeys &&
+          <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row'> 
+              <div className="w-75 p-2">
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='editable' haveHandler={haveHandler}/>
+              </div>
+              <div className="w-25 p-2">
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'} />
+              </div>)
+          </div>}
+          {(tableType=='yesterday') && dkeys &&
+            <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row'> 
+              <div className="w-75 p-2">
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='fixed'/>
+              </div>
+              <div className="w-25 p-2">
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'}/>
+              </div>
+            </div>
+          }
         </div>
-          <div className="w-75 p-2">
+          <div className="d-flex flex-row w-75 p-2">
           {(tableType == 'today') && dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
   	  </div>
-      </div>
-
     </>
   );
 

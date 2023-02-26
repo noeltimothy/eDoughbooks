@@ -43,8 +43,9 @@ function Dashboard() {
         <div className="d-flex flex-column d-sm-flex flex-sm-row">
           <div className="d-flex p-4 flex-column d-sm-flex flex-sm-column">
             <div className="p-4 border rounded shadow-sm overflow-hidden" style={{ 'height': '240px' }}>
-              <div className="d-flex flex-column w-75 d-sm-flex flex-sm-row">
-                  <div className="d-flex p-2 h-40">
+
+              <div className="d-flex flex-column d-sm-flex flex-sm-row">
+                  <div className="d-flex p-2">
                       <h4 className={(pizzaType == 'squares') ? "highlight": ""}> Squares </h4>
                   </div>
                   <div className="d-flex p-2">
@@ -67,13 +68,13 @@ function Dashboard() {
       		</MDBDropdown>
             </div>
 
-            <div className="d-flex flex-column position-static border rounded overflow-hidden shadow-sm p-5">
+            <div className="d-flex flex-column position-static border rounded overflow-hidden shadow-sm p-4 d-sm-flex flex-row">
 	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='yesterday' have={have}/>
             </div>
 
           </div>
-          <div className="w-75 d-flex p-4 flex-column d-sm-flex">
-            <div className="p-4 border rounded overflow-hidden shadow-sm p-5">
+          <div className="d-flex p-4 flex-column d-sm-flex">
+            <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
 	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='today' ev={todays_events}/>
             </div>
           </div>
