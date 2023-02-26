@@ -142,13 +142,29 @@ def today():
 def yesterday():
     pizza_type = request.args.get('pizza_type')
     pizza_size = request.args.get('pizza_size')
-    _df = fetch_daily (engine, pizza_type, pizza_size, datetime.now() - timedelta(days=2))
+    _df = fetch_daily (engine, pizza_type, pizza_size, datetime.now() - timedelta(days=1))
 
     return jsonify({ 
         'data': _df.to_dict('records'),
         'keys': yest_square_keys if pizza_type == 'squares' else yest_round_keys, 
         'headers': square_headers if pizza_type == 'squares' else round_headers
     })
+
+@app.route('/nm', methods=['GET'])
+def nm():
+    pizza_type = request.args.get('pizza_type')
+    pizza_size = request.args.get('pizza_size')
+    _df =  pd.read_sql("select * from nm", engine)
+
+    #return jsonify({ 
+    #    'data': [{
+    #        'small': ','.join([ 20, 20, 20, 25, 25, 25, 20 ]),
+    #        'large': ','.join([ 15, 15, 15, 20, 20, 15, 12 ]),
+    #        'x-large': ','.join([ 6, 6, 6, 10, 10, 8, 8]),
+    #     }],
+    #    'keys': { 'fixed': [ 'small', 'large', 'x-large' ] }, 
+    #    'headers': { 'small': 'Small', 'large': 'Large', 'x-large': 'X-Large' }
+    #})
 
 
 if __name__ == '__main__':

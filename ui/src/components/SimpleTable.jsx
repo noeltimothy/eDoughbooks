@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MDBSpinner  } from 'mdb-react-ui-kit'
+import moment from 'moment';
 
 import './table-component.css';
 
@@ -34,7 +35,7 @@ const Table = (props) => {
                     }}
                   >
                     {(['fixed', 'inset'].includes(ttype)) && data[k]}
-                    {(ttype == 'editable') &&  <input type='text' value={data[k]} onChange={haveHandler} />}
+                    {(ttype == 'editable') &&  <input type='text' value={data[k]} id={k} onChange={haveHandler} />}
                   </td>
 	    </tr>
           )
@@ -69,7 +70,7 @@ const SimpleTable = (props) => {
       await setRawData(json_data.data[0])
       setDataKeys(json_data.keys)
       setDataHeaders(json_data.headers)
-      setDate(json_data.data[0]['created_date'])
+      if (json_data.data[0].hasOwnProperty('created_date')) setDate(json_data.data[0]?.created_date)
 
       setLoading(false);
     }
@@ -81,7 +82,7 @@ const SimpleTable = (props) => {
   // Calculate sold based on have from today's value. This is only done on yesterdays table
   useEffect (() => {
     if (props?.have) {
-      setRawData({...rawData, 'sold': rawData.need - rawData.burned - props.have, 'updated': ['Sold']})
+      setRawData({...rawData, 'sold': rawData.need - rawData.burned - props.have, 'updated': ['sold']})
     }
   }, [props?.have])
     
@@ -93,10 +94,12 @@ const SimpleTable = (props) => {
   )
 
   const haveHandler = async (e) => { 
-    rawData['have'] = e.target.value
-    var new_make = rawData.need - e.target.value
-    await setRawData({...rawData, 'make': new_make, 'waters': Number(new_make / ratios[pizzaSize]).toFixed(2), 'updated': ['MAKE', 'Waters']})
-    if (props.ev) props.ev('have', e.target.value)
+    if (e.target.id == 'have') {
+      rawData['have'] = e.target.value
+      var new_make = rawData.need - e.target.value
+      await setRawData({...rawData, 'make': new_make, 'waters': Number(new_make / ratios[pizzaSize]).toFixed(1), 'updated': ['make', 'waters']})
+      if (props.ev) props.ev('have', e.target.value)
+    }
   }
 
   const burnedHandler = (e) => {
@@ -105,14 +108,24 @@ const SimpleTable = (props) => {
   const dkeys = dataKeys['fixed']
   return (
     <>
-      <h3 style={{ alignSelf: "right" }}> { date } </h3>
+      {date && <div>
+        <h3> {pizzaType.toUpperCase()} [{pizzaSize }] </h3>
+        <h4 style={{ alignSelf: "right" }}> { moment(date).format('ddd, MM-DD-YYYY') } </h4>
+        </div>
+      }
 
       <div style={{ "display": "flex", "flex-direction": "column" }}>
         <div style={{ "display": "flex", "flex-direction": "row", "align-items": "start" }}>
-          {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
+          <div className="w-75 p-2">
+          {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={(tableType=='today') ? 'editable': 'fixed'} haveHandler={haveHandler}/>}
+          </div>
+          <div className="w-25 p-2">
           {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'} />}
+          </div>
         </div>
-          {dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'editable'} haveHandler={haveHandler}/>}
+          <div className="w-75 p-2">
+          {(tableType == 'today') && dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
+  	  </div>
       </div>
 
     </>

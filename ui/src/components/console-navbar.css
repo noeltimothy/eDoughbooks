@@ -4,3 +4,22 @@
   border-style: hidden;
   background-color: transparent;
 }
+
+.nav-link {
+    text-decoration: none;
+    font-family: myriad-pro-condensed,sans-serif;
+    font-size: 1.375rem;
+    color: #fff;
+    letter-spacing: 0;
+    font-weight: 700;
+    transition: .2s;
+}
+
+.nav-link:hover {
+    color: #00ab4e;
+}
+
+.navbar-nav .nav-link.active {
+    color: #00ab4e;
+}
+

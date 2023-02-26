@@ -1,12 +1,12 @@
 import { Helmet } from 'react-helmet';
 import { useState, useEffect } from 'react';
-import Jdenticon from '../components/Jdenticon';
 import useAuth from '../hooks/useAuth';
-import TableComponent from '../components/tableComponent';
 import SimpleTable from '../components/SimpleTable';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { MDBSwitch } from 'mdb-react-ui-kit';
 import { MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem } from 'mdb-react-ui-kit';
+
+import './dashboard.css'
 
 function Dashboard() {
   const title = 'Daily values';
@@ -40,28 +40,22 @@ function Dashboard() {
       <Helmet>
         <title>{title}</title>
       </Helmet>
-      <div className="container-fluid">
-        <div className="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-          <h1 className="h2">{title}</h1>
-        </div>
-      </div>
-        <div className="d-flex flex-row">
-          <div className="w-25 d-flex p-4 flex-column">
-            <div className="d-flex p-4 flex-column border rounded shadow-sm overflow-hidden" style={{ 'height': '240px' }}>
-              <div className="d-flex flex-row">
-                  <div className="p-2">
-                    <h2> Squares </h2>
+        <div className="d-flex flex-column d-sm-flex flex-sm-row">
+          <div className="d-flex p-4 flex-column d-sm-flex flex-sm-column">
+            <div className="p-4 border rounded shadow-sm overflow-hidden" style={{ 'height': '240px' }}>
+              <div className="d-flex flex-column w-75 d-sm-flex flex-sm-row">
+                  <div className="d-flex p-2 h-40">
+                      <h4 className={(pizzaType == 'squares') ? "highlight": ""}> Squares </h4>
                   </div>
-                  <div className="p-2">
-                    <MDBSwitch  onChange={handleSwitch} />
+                  <div className="d-flex p-2">
+                    <MDBSwitch  id='mdbswitch' onChange={handleSwitch}/>
                   </div>
-                  <div className="p-2">
-                    <h2> Rounds </h2>
+                  <div className="d-flex p-2">
+                      <h4 className={(pizzaType == 'rounds') ? "highlight": ""}> Rounds </h4>
                   </div>
                </div>
 
-              <div className='d-flex p-2 flex-row w-50'>
-      		<MDBDropdown onChange={changePizzaSize}>
+      		<MDBDropdown id='mdbdropdown' onChange={changePizzaSize}>
         		<MDBDropdownToggle tag='a' className='btn btn-primary'>
                         {pizzaSize ? pizzaSize : "Select Pizza Size"}
         		</MDBDropdownToggle>
@@ -71,7 +65,6 @@ function Dashboard() {
                         ))}
         		</MDBDropdownMenu>
       		</MDBDropdown>
-              </div>
             </div>
 
             <div className="d-flex flex-column position-static border rounded overflow-hidden shadow-sm p-5">
@@ -79,8 +72,8 @@ function Dashboard() {
             </div>
 
           </div>
-          <div className="w-75 d-flex p-4 flex-column">
-            <div className="d-flex flex-column position-static mw-100 border rounded overflow-hidden shadow-sm p-5">
+          <div className="w-75 d-flex p-4 flex-column d-sm-flex">
+            <div className="p-4 border rounded overflow-hidden shadow-sm p-5">
 	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='today' ev={todays_events}/>
             </div>
           </div>
