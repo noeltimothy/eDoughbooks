@@ -76,7 +76,7 @@ const RunningTotals = (props) => {
   return (
     <>
       <div>
-       <h4> Running Totals </h4>
+       <h4> Waters </h4>
       </div>
 
       <div className='d-flex flex-column d-sm-flex flex-sm-row'>

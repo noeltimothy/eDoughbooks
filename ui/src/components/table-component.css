@@ -1,6 +1,5 @@
 table {
-    width: 100%;
-    table-layout: auto;
+    font-size: 16px;
 }
 
 input { 
@@ -8,7 +7,7 @@ input {
 }
 
 .yesterday {
-    opacity: 90%;
+    opacity: 80%;
 }
 
 #nm > tbody tr td, #nm > thead tr th{

@@ -6,6 +6,7 @@ import RunningTotal from '../components/RunningTotal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { MDBSwitch } from 'mdb-react-ui-kit';
 import { MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem } from 'mdb-react-ui-kit';
+import moment from 'moment';
 
 import './dashboard.css'
 
@@ -21,10 +22,15 @@ function Dashboard() {
   const [ refreshTotals, setRefreshTotals ] = useState(false)
  
   // Handles pizza type change 
-  const handleSwitch = (e) => { (e.target.checked) ? setPizzaType('rounds') : setPizzaType('squares') }
+  const handleSwitch = (e) => { 
+    (e.target.checked) ? setPizzaType('rounds') : setPizzaType('squares') 
+    if (e.target.checked && (pizzaSize == 'x-large')) setPizzaSize('small')
+  }
 
   // handles pizza size selection
-  const changePizzaSize = (e) => { setPizzaSize(e.target.text) };
+  const changePizzaSize = (e) => { 
+    setPizzaSize(e.target.text);  
+  };
 
   // handles updating size dropdown based on pizza type
   useEffect(() => {
@@ -76,19 +82,23 @@ function Dashboard() {
       		</MDBDropdown>
             </div>
 
-            <div className="d-flex flex-column position-static border rounded overflow-hidden shadow-sm p-4 d-sm-flex flex-row">
+            <div className="d-flex flex-column position-static border rounded overflow-hidden shadow-sm p-4 d-sm-flex flex-sm-column">
 	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='yesterday' have={have}/>
             </div>
 
           </div>
+
           <div className="d-flex p-4 flex-column d-sm-flex">
-            <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
-	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='today' ev={todays_events}/>
+            <div>
+              <h3 id='date-panel'> {pizzaType.toUpperCase()} [{pizzaSize }] - {moment(moment.now()).format('ddd, MM-DD-YYYY')} </h3>
             </div>
-          </div>
-          <div className="d-flex p-4 flex-column d-sm-flex">
-            <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
-	      <RunningTotal key={refreshTotals} />
+            <div className="d-flex p-4 flex-column d-sm-flex flex-sm-row">
+              <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
+	        <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='today' ev={todays_events}/>
+              </div>
+              <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
+	        <RunningTotal key={refreshTotals} />
+              </div>
             </div>
           </div>
        </div>

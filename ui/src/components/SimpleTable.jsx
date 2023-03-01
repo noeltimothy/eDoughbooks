@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { MDBSpinner  } from 'mdb-react-ui-kit'
 import moment from 'moment';
+import RunningTotal from './RunningTotal';
 
 import './table-component.css';
 
@@ -10,7 +11,7 @@ const Table = (props) => {
   if (!dkeys.hasOwnProperty(ttype)) return;
 
   return (
-    <table style={{ border: 'solid 1px blue' }} id={ttype}>
+    <table className='w-auto table-responsive' style={{ border: 'solid 1px blue' }} id={ttype}>
       <tbody>
         {dkeys[ttype].map(k => {
           if (dheaders[k]) {
@@ -119,7 +120,7 @@ const SimpleTable = (props) => {
   const dkeys = dataKeys['fixed']
   return (
     <>
-      {date && <div>
+      {(tableType == 'yesterday') && date && <div>
         <h3> {pizzaType.toUpperCase()} [{pizzaSize }] </h3>
         <h4 style={{ alignSelf: "right" }}> { moment(date).format('ddd, MM-DD-YYYY') } </h4>
         </div>
@@ -127,28 +128,29 @@ const SimpleTable = (props) => {
 
       <div className='d-flex flex-column d-sm-flex flex-sm-row'>
         {(tableType == 'today') && dkeys &&
-          <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row today'> 
+          <div className='d-flex flex-column d-sm-flex flex-sm-row today'> 
               <div className="w-75 p-2">
                 <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='editable' haveHandler={haveHandler} sendUpdate={sendUpdate}/>
               </div>
               <div className="w-25 p-2">
                 <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='inset' />
               </div>
-          </div>}
-          {(tableType=='yesterday') && dkeys &&
-            <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row yesterday'> 
-              <div className="w-75 p-2">
-                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='fixed'/>
-              </div>
-              <div className="w-25 p-2">
-                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='inset'/>
-              </div>
+          </div>
+        }
+        {(tableType=='yesterday') && dkeys &&
+          <div className='d-flex flex-column d-sm-flex flex-sm-row yesterday'> 
+            <div className="p-2">
+              <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='fixed'/>
             </div>
-          }
-        </div>
-          <div className="d-flex flex-row w-75 p-2">
-          {(tableType == 'today') && dkeys && <Table className='today' dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
-  	  </div>
+            <div className="p-2">
+              <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='inset'/>
+            </div>
+          </div>
+        }
+      </div>
+      <div className="d-flex flex-column w-75 p-2">
+        {(tableType == 'today') && dkeys && <Table className='today' dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
+      </div>
     </>
   );
 

@@ -29,7 +29,7 @@ yest_square_keys = {
 }
 
 today_round_keys = {
-    'fixed': ['need', 'sold', 'waters'], 
+    'fixed': ['need', 'waters'], 
     'editable': [ 'have', 'burned' ],
     'inset': [ 'make' ]
 }
@@ -59,7 +59,6 @@ round_headers = {
     'need': 'Need',
 }
 
-sq_sizes = { 'small': 31, 'large': 18, 'x-large': 12 }
 
 def compute_need_squares(pizza_size):
     today = datetime.today()
@@ -75,7 +74,10 @@ def compute_need_rounds(pizza_size):
     dates = [ (last_week + timedelta(days=x)).date() for x in range(0, 4) ]
     df = pd.read_sql(f"select *, date(created_date) as d from daily where date(created_date) >= '{dates[0]}'", engine)
     df = df[(df.pizza_type == 'rounds') & (df.pizza_size == pizza_size)]
-    df = df[df.d.isin(dates)]
+    #df = df[df.d.isin(dates)]
+    print (">>>>>>>>>>> need rounds ")
+    print (df)
+
     return (df.sold.sum() / 11).astype(int)
 
 def get_nm(engine, ptype, size):
@@ -118,7 +120,7 @@ def today():
                 'deferred': 0,
                 'next_morning': float(nm),
                 'make': float(need),
-                'waters': float((need / sq_sizes[pizza_size]).round(2)) if pizza_type == 'squares' else 0,
+                'waters': float((need / ratios[pizza_size]).round(2)) if pizza_type == 'squares' else 0,
                 'created_date': datetime.today()
         }
         print ('...............adding new entry .................')
@@ -176,6 +178,7 @@ def running_totals():
     sq = todays_df [ todays_df.pizza_type == 'squares' ]
     rounds = todays_df [ todays_df.pizza_type == 'rounds' ]
     print (sq)
+    print (rounds)
 
     results = {
         'Squares(Small)': float(sq[sq.pizza_size == 'small'].waters.values[0]) if len(sq[sq.pizza_size == 'small']) else 0,
@@ -183,7 +186,7 @@ def running_totals():
         'Squares(X-Large)': float(sq[sq.pizza_size == 'x-large'].waters.values[0]) if len(sq[sq.pizza_size == 'x-large']) else 0,
         'Rounds(Small)': float(rounds[rounds.pizza_size == 'small'].waters.values[0]) if len(rounds[rounds.pizza_size == 'small']) else 0,
         'Rounds(Large)': float(rounds[rounds.pizza_size == 'large'].waters.values[0]) if len(rounds[rounds.pizza_size == 'large']) else 0,
-        'Total': float(todays_df.waters.sum()),
+        'Total': round(float(todays_df.waters.sum()), 2),
     }
 
     print(results)
