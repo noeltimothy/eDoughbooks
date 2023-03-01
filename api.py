@@ -11,6 +11,12 @@ CORS(app)
 
 engine = create_engine("postgresql://postgres:admin@localhost:5432/test")
 
+ratios = {
+    'small': 31, 
+    'large': 18,
+    'x-large': 12
+}
+
 today_square_keys = {
     'fixed': ['need', 'deferred_for_today', 'next_morning', 'waters'], 
     'editable': [ 'have', 'burned', 'deferred' ],
@@ -18,7 +24,7 @@ today_square_keys = {
 }
 
 yest_square_keys = {
-    'fixed': ['need', 'have', 'burned', 'deferred_for_today', 'deferred', 'next_morning', 'sold', 'waters'],
+    'fixed': ['need', 'have', 'burned', 'deferred', 'next_morning', 'sold', 'waters'],
     'inset': [ 'make' ],
 }
 
@@ -72,8 +78,8 @@ def compute_need_rounds(pizza_size):
     df = df[df.d.isin(dates)]
     return (df.sold.sum() / 11).astype(int)
 
-def get_nm(engine, size):
-    if size == 'squares':
+def get_nm(engine, ptype, size):
+    if ptype == 'squares':
         today = datetime.now().strftime('%A')
         df = pd.read_sql(f"select * from nm where pizza_size = '{size}'", engine)
         return  int(df[df.day == today].nm.values[0])
@@ -83,7 +89,6 @@ def get_nm(engine, size):
 def fetch_daily(engine, ptype, size, date):
     df = pd.read_sql(f"select * from daily where date(created_date) = '{date.date()}'", engine)
     print (df)
-
     df = df[(df.pizza_type == ptype) & (df.pizza_size == size)]
     print (f'.. in fetch daily.. {size}, {date}')
     print (df)
@@ -100,19 +105,20 @@ def today():
     yest_df = fetch_daily (engine, pizza_type, pizza_size, yesterday)
 
     if len(todays_df) == 0:
-        need = compute_need_squares(pizza_size) if pizza_type == 'squares' else compute_need_rounds(pizza_size)
+        nm = get_nm(engine, pizza_type, pizza_size)
+        need = compute_need_squares(pizza_size) + nm + yest_df.deferred.values[0] if pizza_type == 'squares' else compute_need_rounds(pizza_size) 
         print (f'new day: adding a new value with computed need value {need}')
         new_entry = { 
-                'store_id':1,
-                'pizza_type':pizza_type,
-                'pizza_size':pizza_size,
-                'need': need,
+                'store_id': 1,
+                'pizza_type': pizza_type,
+                'pizza_size': pizza_size,
+                'need': float(need),
                 'have': 0,
                 'burned': 0,
                 'deferred': 0,
-                'next_morning': get_nm(engine, pizza_size),
-                'make': need,
-                'waters': float((need / sq_sizes[pizza_size])).round(2) if pizza_type == 'squares' else 0,
+                'next_morning': float(nm),
+                'make': float(need),
+                'waters': float((need / sq_sizes[pizza_size]).round(2)) if pizza_type == 'squares' else 0,
                 'created_date': datetime.today()
         }
         print ('...............adding new entry .................')
@@ -122,7 +128,7 @@ def today():
         df.to_sql('daily', engine, if_exists='append')
         
         # Do not store deferred for today in the DB as we get it from yesterdays value
-        new_entry['deferred_for_today'] = yest_df.deferred.values[0] if len(yest_df) else 0
+        new_entry['deferred_for_today'] = int(yest_df.deferred.values[0]) if len(yest_df) else 0
         return jsonify({ 
             'data': [ new_entry ], 
             'keys': today_square_keys if pizza_type == 'squares' else today_round_keys, 
@@ -155,17 +161,60 @@ def nm():
     pizza_type = request.args.get('pizza_type')
     pizza_size = request.args.get('pizza_size')
     _df =  pd.read_sql("select * from nm", engine)
+    _df = _df.groupby('pizza_size').agg({'day': list, 'nm': list})
+    _df = _df.reset_index()
+    _df.day = _df.day.apply(lambda x: [''] + x)
+    return jsonify(_df.to_dict('records'))
 
-    #return jsonify({ 
-    #    'data': [{
-    #        'small': ','.join([ 20, 20, 20, 25, 25, 25, 20 ]),
-    #        'large': ','.join([ 15, 15, 15, 20, 20, 15, 12 ]),
-    #        'x-large': ','.join([ 6, 6, 6, 10, 10, 8, 8]),
-    #     }],
-    #    'keys': { 'fixed': [ 'small', 'large', 'x-large' ] }, 
-    #    'headers': { 'small': 'Small', 'large': 'Large', 'x-large': 'X-Large' }
-    #})
 
+@app.route('/running_totals', methods=['GET'])
+def running_totals():
+    today = datetime.today().date()
+    todays_df = pd.read_sql(f"select * from daily where date(created_date) = '{today}'", engine)
+
+    todays_df = todays_df[todays_df.have != 0]
+    sq = todays_df [ todays_df.pizza_type == 'squares' ]
+    rounds = todays_df [ todays_df.pizza_type == 'rounds' ]
+    print (sq)
+
+    results = {
+        'Squares(Small)': float(sq[sq.pizza_size == 'small'].waters.values[0]) if len(sq[sq.pizza_size == 'small']) else 0,
+        'Squares(Large)': float(sq[sq.pizza_size == 'large'].waters.values[0]) if len(sq[sq.pizza_size == 'large']) else 0,
+        'Squares(X-Large)': float(sq[sq.pizza_size == 'x-large'].waters.values[0]) if len(sq[sq.pizza_size == 'x-large']) else 0,
+        'Rounds(Small)': float(rounds[rounds.pizza_size == 'small'].waters.values[0]) if len(rounds[rounds.pizza_size == 'small']) else 0,
+        'Rounds(Large)': float(rounds[rounds.pizza_size == 'large'].waters.values[0]) if len(rounds[rounds.pizza_size == 'large']) else 0,
+        'Total': float(todays_df.waters.sum()),
+    }
+
+    print(results)
+
+    return jsonify({ 
+        'data': results, 
+        'keys': [ 'Squares(Small)', 'Squares(Large)', 'Squares(X-Large)', 'Rounds(Small)', 'Rounds(Large)', 'Total' ],
+    })
+
+@app.route('/update_today/<pizza_type>/<pizza_size>/<field>/<value>', methods=['GET'])
+def update_today(pizza_type, pizza_size, field, value):
+    today = datetime.today()
+    yesterday = today - timedelta(days=1)
+    _df = fetch_daily(engine, pizza_type, pizza_size, today) 
+    _yest = fetch_daily(engine, pizza_type, pizza_size, yesterday) 
+
+    if field == 'have':
+        new_make = float(_df.need.values[0]) - float(value)
+        new_waters = round((new_make / ratios[pizza_size]), 1)
+        sold = float(_yest.need.values[0]) - float(value) - float(_yest.burned.values[0])
+        print (f'new values will be set to sold: {sold}, have: {value}, make: {new_make}, waters: {new_waters}')
+        engine.execute(f"update daily set {field} = {value} where pizza_size = '{pizza_size}' and pizza_type = '{pizza_type}' and date(created_date) = '{today.date()}'")
+        engine.execute(f"update daily set make = {new_make} where pizza_size = '{pizza_size}' and pizza_type = '{pizza_type}' and date(created_date) = '{today.date()}'")
+        engine.execute(f"update daily set waters = round({new_waters},1) where pizza_size = '{pizza_size}' and pizza_type = '{pizza_type}' and date(created_date) = '{today.date()}'")
+        engine.execute(f"update daily set sold = {sold} where pizza_size = '{pizza_size}' and pizza_type = '{pizza_type}' and date(created_date) = '{yesterday.date()}'")
+    else:
+        engine.execute(f"update daily set {field} = {value} where pizza_size = '{pizza_size}' and pizza_type = '{pizza_type}' and date(created_date) = '{today.date()}'")
+
+    return jsonify({}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+

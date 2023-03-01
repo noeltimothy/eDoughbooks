@@ -5,12 +5,12 @@ import moment from 'moment';
 import './table-component.css';
 
 const Table = (props) => {
-  const { dkeys, dheaders, data, haveHandler, ttype } = props
+  const { dkeys, dheaders, data, haveHandler, ttype, sendUpdate } = props
 
   if (!dkeys.hasOwnProperty(ttype)) return;
 
   return (
-    <table style={{ border: 'solid 1px blue' }}>
+    <table style={{ border: 'solid 1px blue' }} id={ttype}>
       <tbody>
         {dkeys[ttype].map(k => {
           if (dheaders[k]) {
@@ -22,6 +22,7 @@ const Table = (props) => {
                       border: 'solid 1px gray',
                       background: (ttype == 'inset') ? 'lightgrey': 'papayawhip',
                       color: (data.updated && data.updated.includes(k)) ? 'red' : 'black',
+                      "font-weight": (data.updated && data.updated.includes(k)) ? 'bold' : '',
                     }}
                   >
                     {dheaders[k]}
@@ -32,10 +33,11 @@ const Table = (props) => {
                       border: 'solid 1px gray',
                       background: (ttype == 'inset') ? 'lightgrey': 'papayawhip',
                       color: (data.updated && data.updated.includes(k)) ? 'red' : 'black',
+                      "font-weight": (data.updated && data.updated.includes(k)) ? 'bold' : '',
                     }}
                   >
                     {(['fixed', 'inset'].includes(ttype)) && data[k]}
-                    {(ttype == 'editable') &&  <input type='text' value={data[k]} id={k} onChange={haveHandler} />}
+                    {(ttype == 'editable') &&  <input type='text' value={data[k]} id={k} onChange={haveHandler} onBlur={(e)=>sendUpdate(e.target.id, e.target.value)}/>}
                   </td>
 	    </tr>
           )
@@ -93,12 +95,21 @@ const SimpleTable = (props) => {
     </>
   )
 
+  const sendUpdate = async(field, val) => {
+    const url = 'http://localhost:5000/update_today/' + props.pizza_type + '/'+ props.pizza_size + '/'+field + '/'+val
+    const res = await fetch(url)
+    if ((field == 'have') && props.ev) props.ev('refresh')
+  }
+
+  // This have handlers only runs on today's table
   const haveHandler = async (e) => { 
     if (e.target.id == 'have') {
       rawData['have'] = e.target.value
       var new_make = rawData.need - e.target.value
       await setRawData({...rawData, 'make': new_make, 'waters': Number(new_make / ratios[pizzaSize]).toFixed(1), 'updated': ['make', 'waters']})
       if (props.ev) props.ev('have', e.target.value)
+    } else {
+      await setRawData({...rawData, [e.target.id]: e.target.value})
     }
   }
 
@@ -116,27 +127,27 @@ const SimpleTable = (props) => {
 
       <div className='d-flex flex-column d-sm-flex flex-sm-row'>
         {(tableType == 'today') && dkeys &&
-          <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row'> 
+          <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row today'> 
               <div className="w-75 p-2">
-                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='editable' haveHandler={haveHandler}/>
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='editable' haveHandler={haveHandler} sendUpdate={sendUpdate}/>
               </div>
               <div className="w-25 p-2">
-                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'} />
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='inset' />
               </div>
           </div>}
           {(tableType=='yesterday') && dkeys &&
-            <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row'> 
+            <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row yesterday'> 
               <div className="w-75 p-2">
                 <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='fixed'/>
               </div>
               <div className="w-25 p-2">
-                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'inset'}/>
+                <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype='inset'/>
               </div>
             </div>
           }
         </div>
           <div className="d-flex flex-row w-75 p-2">
-          {(tableType == 'today') && dkeys && <Table dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
+          {(tableType == 'today') && dkeys && <Table className='today' dkeys={dataKeys} dheaders={dataHeaders} data={rawData} ttype={'fixed'} />}
   	  </div>
     </>
   );

@@ -7,7 +7,7 @@ import { FaUser } from "react-icons/fa";
 import { logout } from '../services/MockAuthService';
 
 import './console-navbar.css';
-import logo from './doughbooks.png';
+import logo from './logo.png';
 
 function ConsoleNavbar() {
   const navigate = useNavigate();
@@ -28,9 +28,7 @@ function ConsoleNavbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark sticky-top bg-dark p-1 shadow">
       <div className="d-flex flex-grow-1">
-        <a className="navbar-brand d-flex pt-2" href="/console">
-          Admin Console
-        </a>
+          <img src={logo} />
         <div className="collapse navbar-collapse" id="navbarMenu">
           <ul className="navbar-nav">
             {

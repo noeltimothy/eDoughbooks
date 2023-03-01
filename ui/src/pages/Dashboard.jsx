@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet';
 import { useState, useEffect } from 'react';
 import useAuth from '../hooks/useAuth';
 import SimpleTable from '../components/SimpleTable';
+import RunningTotal from '../components/RunningTotal';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { MDBSwitch } from 'mdb-react-ui-kit';
 import { MDBDropdown, MDBDropdownMenu, MDBDropdownToggle, MDBDropdownItem } from 'mdb-react-ui-kit';
@@ -14,9 +15,10 @@ function Dashboard() {
   const { getSession } = useAuth();
   const user = getSession();
   const [ pizzaType, setPizzaType ] = useState('squares')
-  const [ pizzaSize, setPizzaSize ] = useState('')
+  const [ pizzaSize, setPizzaSize ] = useState('small')
   const [ sizes, setSizes ] = useState([ 'small', 'large', 'x-large'])
   const [ have, setHave ] = useState(0)
+  const [ refreshTotals, setRefreshTotals ] = useState(false)
  
   // Handles pizza type change 
   const handleSwitch = (e) => { (e.target.checked) ? setPizzaType('rounds') : setPizzaType('squares') }
@@ -32,7 +34,13 @@ function Dashboard() {
 
   // Handles events from today's table and passes it down to yesterdays table using the default case
   const todays_events = (etype, val) => { 
+    // update yesterdays sold on the UI
     setHave(val)
+
+    // refresh running totals
+    if (etype == 'refresh') {
+      setRefreshTotals(!refreshTotals)
+    }
   }
 
   return (
@@ -80,7 +88,7 @@ function Dashboard() {
           </div>
           <div className="d-flex p-4 flex-column d-sm-flex">
             <div className="p-4 border rounded overflow-hidden shadow-sm p-4">
-	      <SimpleTable pizza_type={pizzaType} pizza_size={pizzaSize} table_type='yesterday' ev={todays_events}/>
+	      <RunningTotal key={refreshTotals} />
             </div>
           </div>
        </div>

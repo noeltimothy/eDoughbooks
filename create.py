@@ -1,4 +1,3 @@
-from models.daily.daily import Daily
 from sqlalchemy import create_engine
 from datetime import datetime, timedelta
 import pandas as pd
@@ -14,7 +13,7 @@ pizza_sizes.append('x-large') if pizza_type == 'squares' else None
 
 
 for w in range(0, 4):
-    d = datetime.today() - timedelta(weeks=w) - timedelta(days=4)
+    d = datetime.today() - timedelta(weeks=w) - timedelta(days=2)
     dates = pd.DataFrame([ d + timedelta(days=x) for x in range (0, 7)])
     for pizza_size in pizza_sizes:
         df = pd.read_csv(csv)

@@ -1,13 +1,14 @@
 import { NavLink } from 'react-router-dom';
 
 import './navbar.css';
-import logo from './doughbooks.png';
+import logo from './logo.png';
 
 function MainNavbar() {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
       <div className="container-fluid">
-        <a className="navbar-brand d-flex pt-2" href="/">
+        <img src={logo} />
+        <a className="navbar-brand d-flex pt-2 text-left" href="/" >
           eDoughBooks
         </a>
         <button className="navbar-toggler collapsed"
