@@ -7,6 +7,7 @@ body {
 
 body {
   align-items: center;
+  font-family: myriad-pro-condensed,sans-serif;
 }
 
 .container-auth {
@@ -50,8 +51,8 @@ body {
     background-color: #00ab4e;
 }
 
-button > .btn-primary: hover {
-    background-color: #00ab3f;
+button > .btn-primary:hover {
+    background-color: #00ab4e;
 }
 
 h3 {

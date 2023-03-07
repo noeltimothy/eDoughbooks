@@ -1,0 +1,25 @@
+
+#mdbswitch {
+  width: 4em;
+  height: 2em;
+  background-color: #00ab4e;
+}
+
+#selector-panel > h4 {
+  font-size: 2em;
+}
+
+.highlight {
+  color: #00ab4e;
+  font-weight: bold;
+}
+
+#mdbdropdown > a {
+  width: 100%;
+}
+
+#date-panel {
+  border-bottom: 1px solid grey;
+  border-top: 1px solid grey;
+  padding: 10px;
+}

@@ -19,6 +19,12 @@ const Table = (props) => {
                       border: 'solid 1px gray',
                       background: 'papayawhip',
                       color: data[k] ? 'green' : 'red',
+                      'font-weight': (k=='Total') ? 'bold' : '',
+                      'font-style': (k=='Total') ? 'italic' : '',
+                      'border-top': (k=='Total') ? '1px solid grey' : '',
+                      'border-bottom': (k=='Total') ? '1px solid grey' : '',
+                      'border-width': (k=='Total') ? '3px' : '',
+                      'border-right': 'none',
                     }}
                   >
                     {k}
@@ -29,6 +35,12 @@ const Table = (props) => {
                       border: 'solid 1px gray',
                       background: 'papayawhip',
                       color: data[k] ? 'green' : 'red',
+                      'font-weight': (k=='Total') ? 'bold' : '',
+                      'font-style': (k=='Total') ? 'italic' : '',
+                      'border-top': (k=='Total') ? '1px solid grey' : '',
+                      'border-bottom': (k=='Total') ? '1px solid grey' : '',
+                      'border-width': (k=='Total') ? '3px' : '',
+                      'border-left': 'none',
                     }}
                   >
                     {data[k]}
@@ -44,8 +56,7 @@ const Table = (props) => {
 const RunningTotals = (props) => {
 
   const [ rawData, setRawData ] = useState([])
-  const [ dataKeys, setDataKeys ] = useState([])
-  const [ loading, setLoading ] = useState(false);
+  const [ loading, setLoading ] = useState(true);
   let updated = [];
 
 
@@ -53,13 +64,9 @@ const RunningTotals = (props) => {
     const fetchData = async() => {
       setLoading(true);
       const url = 'http://localhost:5000/running_totals'
-      console.log (url)
       const res = await fetch(url)
       const json_data = await res.json();
       await setRawData(json_data.data)
-      console.log (json_data.data)
-
-      setDataKeys(json_data.keys)
       setLoading(false);
     }
     fetchData();
@@ -72,7 +79,6 @@ const RunningTotals = (props) => {
     </>
   )
 
-  const dkeys = dataKeys
   return (
     <>
       <div>
@@ -80,10 +86,19 @@ const RunningTotals = (props) => {
       </div>
 
       <div className='d-flex flex-column d-sm-flex flex-sm-row'>
-          {dkeys &&
+          {!loading &&
             <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row yesterday'> 
               <div className="w-75 p-2">
-                <Table dkeys={dataKeys} data={rawData}/>
+                <Table dkeys={Object.keys(rawData.squares)} data={rawData.squares}/>
+              </div>
+            </div>
+          }
+      </div>
+      <div className='d-flex flex-column d-sm-flex flex-sm-row'>
+          {!loading &&
+            <div className='w-100 d-flex flex-row d-sm-flex flex-sm-row yesterday'> 
+              <div className="w-75 p-2">
+                <Table dkeys={Object.keys(rawData.rounds)} data={rawData.rounds}/>
               </div>
             </div>
           }

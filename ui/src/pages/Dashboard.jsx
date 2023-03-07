@@ -58,7 +58,7 @@ function Dashboard() {
           <div className="d-flex p-4 flex-column d-sm-flex flex-sm-column">
             <div className="p-4 border rounded shadow-sm overflow-hidden" style={{ 'height': '240px' }}>
 
-              <div className="d-flex flex-column d-sm-flex flex-sm-row">
+              <div id="selector-panel" className="d-flex flex-column d-sm-flex flex-sm-row">
                   <div className="d-flex p-2">
                       <h4 className={(pizzaType == 'squares') ? "highlight": ""}> Squares </h4>
                   </div>

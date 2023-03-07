@@ -5,8 +5,24 @@ import RunningTotal from './RunningTotal';
 
 import './table-component.css';
 
+const FractionInput = (props) => {
+  const { pizzaSize, datakey, value, haveHandler, sendUpdate } = props
+  const ratios = { 'small': 11, 'large': 18 }
+  return (
+    <div className='d-flex flex-row col-sm-10'>
+      <div className='w-75'>
+      <input type='text' value={value} id={datakey} onChange={(e) => haveHandler(e)} onBlur={(e)=>sendUpdate(e.target.id, e.target.value)}/> 
+      </div>
+      <div className='w-25' style={{ 'margin-left': '10px' }}>
+      <p> / {ratios[pizzaSize]} </p>
+      </div>
+    </div>
+  )
+}
+
 const Table = (props) => {
   const { dkeys, dheaders, data, haveHandler, ttype, sendUpdate } = props
+  const fractions = ['upfront_fraction', 'walkin_fraction']
 
   if (!dkeys.hasOwnProperty(ttype)) return;
 
@@ -38,7 +54,8 @@ const Table = (props) => {
                     }}
                   >
                     {(['fixed', 'inset'].includes(ttype)) && data[k]}
-                    {(ttype == 'editable') &&  <input type='text' value={data[k]} id={k} onChange={haveHandler} onBlur={(e)=>sendUpdate(e.target.id, e.target.value)}/>}
+                    {(ttype == 'editable') && (!fractions.includes(k)) &&  <input type='text' value={data[k]} id={k} onChange={haveHandler} onBlur={(e)=>sendUpdate(e.target.id, e.target.value)}/>}
+                    {(ttype == 'editable') && (fractions.includes(k)) && <FractionInput pizzaSize={data['pizza_size']} datakey={k} value={data[k]} sendUpdate={sendUpdate} haveHandler={haveHandler} />}
                   </td>
 	    </tr>
           )
@@ -96,21 +113,39 @@ const SimpleTable = (props) => {
     </>
   )
 
+  // Have changes Make value and we refresh totals
   const sendUpdate = async(field, val) => {
     const url = 'http://localhost:5000/update_today/' + props.pizza_type + '/'+ props.pizza_size + '/'+field + '/'+val
     const res = await fetch(url)
-    if ((field == 'have') && props.ev) props.ev('refresh')
+    if (['have', 'upfront_whole', 'upfront_fraction', 'walkin_whole', 'walkin_fraction'].includes(field) && props.ev) props.ev('refresh')
   }
 
   // This have handlers only runs on today's table
   const haveHandler = async (e) => { 
-    if (e.target.id == 'have') {
-      rawData['have'] = e.target.value
-      var new_make = rawData.need - e.target.value
-      await setRawData({...rawData, 'make': new_make, 'waters': Number(new_make / ratios[pizzaSize]).toFixed(1), 'updated': ['make', 'waters']})
-      if (props.ev) props.ev('have', e.target.value)
-    } else {
-      await setRawData({...rawData, [e.target.id]: e.target.value})
+    const ratios = { 'small': 11, 'large': 18 }
+    if (pizzaType == 'squares') {
+      if (e.target.id == 'have') {
+        rawData['have'] = e.target.value
+        var new_make = rawData.need - e.target.value
+        await setRawData({...rawData, 'make': new_make, 'waters': Number(new_make / ratios[pizzaSize]).toFixed(1), 'updated': ['make', 'waters']})
+        if (props.ev) props.ev('have', e.target.value)
+      } else {
+        await setRawData({...rawData, [e.target.id]: e.target.value})
+      }
+    }
+    if (pizzaType == 'rounds') {
+      if (['upfront_whole', 'upfront_fraction', 'walkin_whole', 'walkin_fraction'].includes(e.target.id)) {
+
+        let newdata = rawData
+        newdata[e.target.id] = Number(e.target.value)
+        let have = ((Number(newdata.upfront_whole) + (Number(newdata.upfront_fraction) / ratios[pizzaSize])) +
+                 (Number(newdata.walkin_whole) + (Number(newdata.walkin_fraction) / ratios[pizzaSize]))).toFixed(2)
+
+        console.log (newdata)
+        newdata.have = have
+        await setRawData(newdata)
+        if (props.ev) props.ev('have', have)
+      }
     }
   }
 
