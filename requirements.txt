@@ -2,4 +2,4 @@ flask
 psycopg2-binary
 pandas
 flask_cors
-sqlalchemy
+sqlalchemy==1.4.46
