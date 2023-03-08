@@ -83,7 +83,7 @@ const SimpleTable = (props) => {
   useEffect (() => {
     const fetchData = async() => {
       setLoading(true);
-      const url = 'http://localhost:5000/'+tableType + '?' + 'pizza_type='+props.pizza_type + '&pizza_size='+ props.pizza_size
+      const url = tableType + '?' + 'pizza_type='+props.pizza_type + '&pizza_size='+ props.pizza_size
       console.log (url)
       const res = await fetch(url)
       const json_data = await res.json();
@@ -115,7 +115,7 @@ const SimpleTable = (props) => {
 
   // Have changes Make value and we refresh totals
   const sendUpdate = async(field, val) => {
-    const url = 'http://localhost:5000/update_today/' + props.pizza_type + '/'+ props.pizza_size + '/'+field + '/'+val
+    const url = 'update_today/' + props.pizza_type + '/'+ props.pizza_size + '/'+field + '/'+val
     const res = await fetch(url)
     if (['have', 'upfront_whole', 'upfront_fraction', 'walkin_whole', 'walkin_fraction'].includes(field) && props.ev) props.ev('refresh')
   }

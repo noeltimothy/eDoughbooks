@@ -41,7 +41,18 @@ function isAuth() {
 }
 
 async function login(username, password) {
-  return new Promise((resolve, reject) => {
+  const response = await fetch('http://localhost:5000/login?username='+username+'&password='+password)
+  if (response?.ok) {
+      const token = newToken();
+      const user = await response.json()
+      console.log (user[0])
+      setSession(user[0], token);
+      return token;
+  } else {
+        return new Error('invalid credentials');
+  }
+
+  /*return new Promise((resolve, reject) => {
     // Using setTimeout to simulate network latency.
     setTimeout(() => {
       const found = registeredUsers.get(username);
@@ -57,7 +68,7 @@ async function login(username, password) {
       setSession(found, token);
       return resolve(token);
     }, 2000);
-  });
+  });*/
 }
 
 async function logout() {

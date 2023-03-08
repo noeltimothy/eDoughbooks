@@ -63,7 +63,7 @@ const RunningTotals = (props) => {
   useEffect (() => {
     const fetchData = async() => {
       setLoading(true);
-      const url = 'http://localhost:5000/running_totals'
+      const url = 'running_totals'
       const res = await fetch(url)
       const json_data = await res.json();
       await setRawData(json_data.data)
