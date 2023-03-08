@@ -41,7 +41,7 @@ function isAuth() {
 }
 
 async function login(username, password) {
-  const response = await fetch('http://localhost:5000/login?username='+username+'&password='+password)
+  const response = await fetch('login?username='+username+'&password='+password)
   if (response?.ok) {
       const token = newToken();
       const user = await response.json()

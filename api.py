@@ -102,6 +102,16 @@ def fetch_daily(engine, ptype, size, date):
     print (df)
     return df
 
+@app.route('/login', methods=['GET'])
+def login():
+    username = request.args.get('username')
+    password = request.args.get('password')
+    df = pd.read_sql(f"select * from users where username = '{username}' and password = '{password}'", engine)
+    if len(df):
+        return jsonify(df.to_dict('records')), 200 
+    else:
+        return {}, 500
+
 @app.route('/today', methods=['GET'])
 def today():
     pizza_type = request.args.get('pizza_type')
